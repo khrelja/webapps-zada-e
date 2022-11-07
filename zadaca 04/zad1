@@ -1,0 +1,58 @@
+const express = require("express");
+const { v4: uuidv4 } = require("uuid");
+const bodyParser = require("body-parser");
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+let notice = [];
+
+app.get("/", (req, res) => {
+  res.send("Webapps!");
+});
+
+app.post("/dodajObavjest", (req, res) => {
+  var data = req.body;
+  console.log(data);
+
+  data = { ...data, id: uuidv4(), datum: Date() };
+  notice.push(data);
+  res.send(notice);
+});
+
+app.get("/vratiObavjesti", (req, res) => {
+  var data;
+  var temp = [];
+
+  for (k in notice) {
+    data = notice[k].naziv + " " + notice[k].datum;
+    temp.push(data);
+  }
+  res.send(temp);
+});
+
+app.get("/vratiObavjest", (req, res) => {
+  var data;
+  var temp = [];
+
+  for (k in notice) {
+    data = notice[k].naziv + " " + notice[k].content + " " + notice[k].datum;
+    temp.push(data);
+  }
+  res.send(temp);
+});
+
+app.patch("/izmjeniObavjest/:id", (req, res) => {
+  var { id } = req.params;
+  console.log(id);
+  var { content } = req.body;
+
+  var noti = notice.find((x) => x.id == id);
+  noti.content = content;
+  console.log(noti);
+  res.send(notice);
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
